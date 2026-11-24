@@ -4,6 +4,7 @@
 
 TriggerBot::TriggerBot() : IModule(0, Category::COMBAT, "Attacks entities you're looking at") {
 	this->registerIntSetting("delay", &this->delay, this->delay, 0, 20);
+	this->registerBoolSetting("Eat fix", &this->eatFix, this->eatFix);
 }
 
 TriggerBot::~TriggerBot() {
@@ -12,10 +13,20 @@ TriggerBot::~TriggerBot() {
 const char* TriggerBot::getModuleName() {
 	return ("TriggerBot");
 }
+
 void TriggerBot::onTick(C_GameMode* gm) {
 	C_LocalPlayer* localPlayer = g_Data.getLocalPlayer();
+	if (localPlayer == nullptr)
+		return;
+
+	// No interrumpir comer / beber / usar items
+	if (eatFix && localPlayer->getTicksUsingItem() > 0) {
+		Odelay = delay;  // deja el timer listo para atacar en cuanto sueltes
+		return;
+	}
+
 	C_Entity* target = g_Data.getClientInstance()->getPointerStruct()->getEntity();
-	
+
 	Odelay++;
 	if (target != 0 && Odelay >= delay) {
 		if (!Target::isValidTarget(target))
