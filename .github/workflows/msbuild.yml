@@ -16,6 +16,13 @@ jobs:
 
       - uses: nuget/setup-nuget@v2
 
+      - name: Instalar ATL
+        shell: pwsh
+        run: |
+          $vsw = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vsw -latest -property installationPath
+          Start-Process -Wait -FilePath "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe" -ArgumentList "modify --installPath `"$vs`" --add Microsoft.VisualStudio.Component.VC.14.29.16.11.ATL --quiet --norestart --nocache"
+
       - name: Restaurar paquetes NuGet
         run: nuget restore Horion.sln
 
